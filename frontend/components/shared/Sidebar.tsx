@@ -26,7 +26,7 @@ const NAV = [
   { href: "/dashboard/history",    label: "History",    icon: History,       phase: 5 },
 ]
 
-const CURRENT_PHASE = 1
+const CURRENT_PHASE = 2
 
 export function Sidebar() {
   const pathname = usePathname()

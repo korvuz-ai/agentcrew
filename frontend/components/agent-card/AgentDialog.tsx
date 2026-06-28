@@ -1,0 +1,199 @@
+// Purpose: Create / edit agent dialog — level picker, provider toggles, skill assignment
+// Used by: app/dashboard/agents/page.tsx
+
+"use client"
+
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  LEVEL_COLOR, LEVEL_LABEL, LEVEL_MODELS, PROVIDER_COLOR, PROVIDER_LABEL,
+  type Agent, type Level, type Provider, type Skill,
+} from "@/lib/types"
+
+const ALL_PROVIDERS: Provider[] = ["claude", "gemini", "gpt"]
+const ALL_LEVELS: Level[] = [1, 2, 3]
+
+interface Props {
+  open: boolean
+  agent?: Agent | null      // null = create mode
+  skills: Skill[]
+  onSave: (data: Omit<Agent, "id" | "createdAt">) => void
+  onClose: () => void
+}
+
+const EMPTY = (): Omit<Agent, "id" | "createdAt"> => ({
+  name: "",
+  role: "",
+  backstory: "",
+  level: 2,
+  providers: ["claude"],
+  skillIds: [],
+  systemPromptOverride: "",
+})
+
+export function AgentDialog({ open, agent, skills, onSave, onClose }: Props) {
+  const [form, setForm] = useState(EMPTY())
+
+  useEffect(() => {
+    setForm(agent ? { ...agent } : EMPTY())
+  }, [agent, open])
+
+  function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
+    setForm((f) => ({ ...f, [k]: v }))
+  }
+
+  function toggleProvider(p: Provider) {
+    set("providers", form.providers.includes(p)
+      ? form.providers.filter((x) => x !== p)
+      : [...form.providers, p]
+    )
+  }
+
+  function toggleSkill(id: string) {
+    set("skillIds", form.skillIds.includes(id)
+      ? form.skillIds.filter((x) => x !== id)
+      : [...form.skillIds, id]
+    )
+  }
+
+  function handleSave() {
+    if (!form.name.trim() || !form.role.trim() || form.providers.length === 0) return
+    onSave(form)
+    onClose()
+  }
+
+  const valid = form.name.trim() && form.role.trim() && form.providers.length > 0
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{agent ? "Edit Agent" : "New Agent"}</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-5 py-1">
+          {/* Name + Role */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Name</Label>
+              <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Alex" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Role / Title</Label>
+              <Input value={form.role} onChange={(e) => set("role", e.target.value)} placeholder="e.g. Researcher" />
+            </div>
+          </div>
+
+          {/* Backstory */}
+          <div className="space-y-1.5">
+            <Label>Backstory / Personality</Label>
+            <Textarea
+              rows={3}
+              value={form.backstory}
+              onChange={(e) => set("backstory", e.target.value)}
+              placeholder="Describe the agent's personality, expertise, and working style..."
+            />
+          </div>
+
+          {/* Level */}
+          <div className="space-y-1.5">
+            <Label>Level</Label>
+            <div className="grid grid-cols-3 gap-2">
+              {ALL_LEVELS.map((lv) => (
+                <button
+                  key={lv}
+                  type="button"
+                  onClick={() => set("level", lv)}
+                  className={`rounded-lg border p-2.5 text-center transition ${
+                    form.level === lv
+                      ? `${LEVEL_COLOR[lv]} ring-1 ring-current`
+                      : "border-border bg-card text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <p className="text-xs font-bold">Lv.{lv}</p>
+                  <p className="text-[11px] font-medium">{LEVEL_LABEL[lv]}</p>
+                  <p className="mt-1 text-[10px] opacity-70">{LEVEL_MODELS[lv].claude}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Providers */}
+          <div className="space-y-1.5">
+            <Label>Allowed LLM Providers</Label>
+            <div className="flex gap-2">
+              {ALL_PROVIDERS.map((p) => {
+                const active = form.providers.includes(p)
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => toggleProvider(p)}
+                    className={`flex-1 rounded-lg border py-2 text-xs font-medium transition ${
+                      active ? PROVIDER_COLOR[p] : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {PROVIDER_LABEL[p]}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Skills */}
+          {skills.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Skills</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {skills.map((s) => {
+                  const selected = form.skillIds.includes(s.id)
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => toggleSkill(s.id)}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                        selected
+                          ? "border-primary/40 bg-primary/10 text-primary font-medium"
+                          : "border-border text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {s.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* System prompt override */}
+          <details className="group">
+            <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+              Advanced — System prompt override
+            </summary>
+            <Textarea
+              className="mt-2 font-mono text-xs"
+              rows={4}
+              value={form.systemPromptOverride}
+              onChange={(e) => set("systemPromptOverride", e.target.value)}
+              placeholder="Override the system prompt generated from backstory + skills. Leave empty to auto-generate."
+            />
+          </details>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button disabled={!valid} onClick={handleSave}>
+            {agent ? "Save changes" : "Create agent"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

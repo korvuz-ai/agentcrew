@@ -87,6 +87,7 @@ export default function AgentsPage() {
           open
           agent={editing}
           skills={skills}
+          allAgents={agents}
           onSave={(data) =>
             editing ? updateAgent(editing.id, data) : createAgent(data)
           }

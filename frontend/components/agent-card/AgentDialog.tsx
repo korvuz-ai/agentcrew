@@ -24,6 +24,7 @@ interface Props {
   open: boolean
   agent?: Agent | null      // null = create mode
   skills: Skill[]
+  allAgents?: Agent[]       // for "Reports to" dropdown
   onSave: (data: Omit<Agent, "id" | "createdAt">) => void
   onClose: () => void
 }
@@ -32,14 +33,15 @@ const EMPTY = (): Omit<Agent, "id" | "createdAt"> => ({
   name: "",
   role: "",
   backstory: "",
-  avatar: "🤖",
+  avatar: "CEO-Fi.png",
+  managerId: undefined,
   level: 2,
   providers: ["claude"],
   skillIds: [],
   systemPromptOverride: "",
 })
 
-export function AgentDialog({ open, agent, skills, onSave, onClose }: Props) {
+export function AgentDialog({ open, agent, skills, allAgents = [], onSave, onClose }: Props) {
   const [form, setForm] = useState(EMPTY())
 
   useEffect(() => {
@@ -185,6 +187,26 @@ export function AgentDialog({ open, agent, skills, onSave, onClose }: Props) {
               })}
             </div>
           </div>
+
+          {/* Reports to */}
+          {allAgents.filter(a => a.id !== agent?.id).length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Reports to</Label>
+              <select
+                value={form.managerId ?? ""}
+                onChange={(e) => set("managerId", e.target.value || undefined)}
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              >
+                <option value="">— None (Top-level) —</option>
+                {allAgents
+                  .filter(a => a.id !== agent?.id)
+                  .map(a => (
+                    <option key={a.id} value={a.id}>{a.name} · {a.role}</option>
+                  ))
+                }
+              </select>
+            </div>
+          )}
 
           {/* Skills */}
           {skills.length > 0 && (

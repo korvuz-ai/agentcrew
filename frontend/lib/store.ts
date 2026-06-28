@@ -5,8 +5,15 @@
 
 import { useEffect, useState, useCallback } from "react"
 import type { Agent, Skill } from "./types"
+import { buildDemoTeam } from "./seeds"
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// Bump this string whenever seeds change — forces a re-seed on next load
+const SEED_VERSION = "v4"
+const SEED_VER_KEY = "korvuz:seed-version"
+const AGENTS_KEY   = "korvuz:agents"
+const SKILLS_KEY   = "korvuz:skills"
+
+// ── helpers ───────────────────────────────────────────────────────────────────
 
 function readLS<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback
@@ -28,14 +35,24 @@ function uid() {
     : Math.random().toString(36).slice(2)
 }
 
-// ── Agents ────────────────────────────────────────────────────────────────────
+// Auto-seed if version mismatch — returns true when seed was applied
+function ensureSeeded(): boolean {
+  if (typeof window === "undefined") return false
+  if (localStorage.getItem(SEED_VER_KEY) === SEED_VERSION) return false
+  const { agents, skills } = buildDemoTeam()
+  writeLS(AGENTS_KEY, agents)
+  writeLS(SKILLS_KEY, skills)
+  localStorage.setItem(SEED_VER_KEY, SEED_VERSION)
+  return true
+}
 
-const AGENTS_KEY = "korvuz:agents"
+// ── Agents ────────────────────────────────────────────────────────────────────
 
 export function useAgents() {
   const [agents, setAgents] = useState<Agent[]>([])
 
   useEffect(() => {
+    ensureSeeded()
     setAgents(readLS<Agent[]>(AGENTS_KEY, []))
   }, [])
 
@@ -67,27 +84,24 @@ export function useAgents() {
     [save]
   )
 
-  const loadSeeds = useCallback(
-    (seedAgents: Agent[], seedSkills: Skill[]) => {
-      // Replace all — clears existing data then loads fresh demo
-      writeLS(AGENTS_KEY, seedAgents)
-      writeLS(SKILLS_KEY, seedSkills)
-      setAgents(seedAgents)
-    },
-    []
-  )
+  const resetToDemo = useCallback(() => {
+    const { agents: a, skills: s } = buildDemoTeam()
+    writeLS(AGENTS_KEY, a)
+    writeLS(SKILLS_KEY, s)
+    localStorage.setItem(SEED_VER_KEY, SEED_VERSION)
+    setAgents(a)
+  }, [])
 
-  return { agents, createAgent, updateAgent, deleteAgent, loadSeeds }
+  return { agents, createAgent, updateAgent, deleteAgent, resetToDemo }
 }
 
 // ── Skills ────────────────────────────────────────────────────────────────────
-
-const SKILLS_KEY = "korvuz:skills"
 
 export function useSkills() {
   const [skills, setSkills] = useState<Skill[]>([])
 
   useEffect(() => {
+    // ensureSeeded already ran in useAgents (same render cycle), just read
     setSkills(readLS<Skill[]>(SKILLS_KEY, []))
   }, [])
 

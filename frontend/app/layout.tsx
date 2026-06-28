@@ -1,4 +1,4 @@
-// Purpose: Root layout — ClerkProvider (when key is set), global fonts, base HTML structure
+// Purpose: Root layout — global fonts, metadata, base HTML structure
 // Used by: all pages in the app
 
 import type { Metadata } from "next"
@@ -21,22 +21,12 @@ export const metadata: Metadata = {
   description: "Build and run your AI agent company",
 }
 
-// ClerkProvider is loaded lazily so the app builds and runs without keys configured
-const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-export default async function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
-  const body = (
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
   )
-
-  if (!CLERK_KEY) return body
-
-  const { ClerkProvider } = await import("@clerk/nextjs")
-  return <ClerkProvider>{body}</ClerkProvider>
 }

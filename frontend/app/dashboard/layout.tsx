@@ -1,12 +1,7 @@
 // Purpose: Dashboard shell — sidebar + main content area for all /dashboard/* pages
 // Used by: all pages under app/dashboard/
 
-import dynamic from "next/dynamic"
-
-// Sidebar uses Clerk hooks — load client-only to avoid prerender errors when Clerk is unconfigured
-const Sidebar = dynamic(() => import("@/components/shared/Sidebar").then((m) => m.Sidebar), {
-  ssr: false,
-})
+import { Sidebar } from "@/components/shared/Sidebar"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

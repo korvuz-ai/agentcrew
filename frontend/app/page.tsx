@@ -1,8 +1,8 @@
-// Purpose: Root page — redirects to /onboarding (Clerk auth redirect will override this in Phase 1)
+// Purpose: Root page — redirects directly to dashboard (no auth required)
 // Used by: Next.js App Router entry point
 
 import { redirect } from "next/navigation"
 
 export default function RootPage() {
-  redirect("/onboarding")
+  redirect("/dashboard")
 }

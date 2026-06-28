@@ -4,6 +4,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  LEVEL_COLOR, LEVEL_LABEL, LEVEL_MODELS, PROVIDER_COLOR, PROVIDER_LABEL,
+  AGENT_IMAGES, LEVEL_COLOR, LEVEL_LABEL, LEVEL_MODELS, PROVIDER_COLOR, PROVIDER_LABEL,
   type Agent, type Level, type Provider, type Skill,
 } from "@/lib/types"
 
@@ -26,8 +27,6 @@ interface Props {
   onSave: (data: Omit<Agent, "id" | "createdAt">) => void
   onClose: () => void
 }
-
-const EMOJI_OPTIONS = ["🤖","🧠","✍️","⚙️","📊","🗺️","🔍","💡","🛡️","🎯","📈","🧪","🌐","📝","🔧","🎨","📣","🤝","⚡","🔮"]
 
 const EMPTY = (): Omit<Agent, "id" | "createdAt"> => ({
   name: "",
@@ -81,18 +80,35 @@ export function AgentDialog({ open, agent, skills, onSave, onClose }: Props) {
         </DialogHeader>
 
         <div className="space-y-5 py-1">
-          {/* Avatar emoji picker */}
-          <div className="space-y-1.5">
+          {/* Avatar picker — images */}
+          <div className="space-y-2">
             <Label>Avatar</Label>
-            <div className="flex flex-wrap gap-1.5">
-              {EMOJI_OPTIONS.map((emoji) => (
+            <div className="grid grid-cols-7 gap-1.5">
+              {AGENT_IMAGES.map((img) => (
+                <button
+                  key={img}
+                  type="button"
+                  onClick={() => set("avatar", img)}
+                  className={`relative overflow-hidden rounded-lg border bg-secondary/50 transition aspect-square ${
+                    form.avatar === img
+                      ? "border-primary ring-2 ring-primary/40"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <Image src={`/agents/${img}`} alt={img} fill className="object-contain p-0.5" />
+                </button>
+              ))}
+            </div>
+            {/* Emoji fallback row */}
+            <div className="flex flex-wrap gap-1">
+              {["🤖","🧠","✍️","⚙️","📊","🗺️","🔍","💡","🛡️","🎯","📈","🧪","🌐","📝","🔧","🎨","📣","🤝","⚡","🔮"].map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => set("avatar", emoji)}
-                  className={`rounded-lg border p-1.5 text-xl transition ${
+                  className={`rounded-lg border p-1 text-lg transition ${
                     form.avatar === emoji
-                      ? "border-primary/60 bg-primary/10 ring-1 ring-primary/40"
+                      ? "border-primary/60 bg-primary/10 ring-1 ring-primary/30"
                       : "border-border hover:bg-muted"
                   }`}
                 >

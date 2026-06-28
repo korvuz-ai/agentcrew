@@ -43,31 +43,31 @@ export function buildDemoTeam(): { agents: Agent[]; skills: Skill[] } {
 
   const agents: Agent[] = [
     {
-      id: uid(), avatar: "🧠", name: "Alex", role: "Research Lead",
+      id: uid(), avatar: "CEO-Fi.png", name: "Alex", role: "Research Lead",
       backstory: "Senior analyst with 10 years experience. Methodical, cites everything, loves going deep on a topic before forming opinions.",
       level: 3, providers: ["claude"], skillIds: [s_research.id, s_data.id],
       systemPromptOverride: "", createdAt: now,
     },
     {
-      id: uid(), avatar: "✍️", name: "Sam", role: "Content Strategist",
+      id: uid(), avatar: "Content-SEO-Writer.png", name: "Sam", role: "Content Strategist",
       backstory: "Former journalist turned content marketer. Knows how to make complex topics accessible. Always thinks about the reader first.",
       level: 2, providers: ["claude", "gemini"], skillIds: [s_write.id, s_research.id],
       systemPromptOverride: "", createdAt: now,
     },
     {
-      id: uid(), avatar: "⚙️", name: "Jordan", role: "Senior Engineer",
+      id: uid(), avatar: "Lead-Developer.png", name: "Jordan", role: "Senior Engineer",
       backstory: "Full-stack dev who cares deeply about clean code and pragmatic solutions. Speaks plainly and hates over-engineering.",
       level: 3, providers: ["claude", "gpt"], skillIds: [s_code.id],
       systemPromptOverride: "", createdAt: now,
     },
     {
-      id: uid(), avatar: "📊", name: "Kai", role: "Data Analyst",
+      id: uid(), avatar: "CFO.png", name: "Kai", role: "Data Analyst",
       backstory: "Numbers person who translates raw data into business decisions. Prefers Markdown tables and bullet summaries over long prose.",
       level: 2, providers: ["gemini"], skillIds: [s_data.id, s_plan.id],
       systemPromptOverride: "", createdAt: now,
     },
     {
-      id: uid(), avatar: "🗺️", name: "Morgan", role: "Project Manager",
+      id: uid(), avatar: "Marketing-Manager.png", name: "Morgan", role: "Project Manager",
       backstory: "Keeps the team on track. Breaks big goals into clear tasks, flags risks early, and always asks 'what's the next action?'",
       level: 1, providers: ["claude"], skillIds: [s_plan.id],
       systemPromptOverride: "", createdAt: now,

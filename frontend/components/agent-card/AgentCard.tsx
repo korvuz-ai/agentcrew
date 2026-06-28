@@ -1,6 +1,7 @@
 // Purpose: Displays a single agent as a trading-card style tile with level, providers, skills
 // Used by: app/dashboard/agents/page.tsx
 
+import Image from "next/image"
 import { Bot, Plus, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -8,6 +9,26 @@ import {
   PROVIDER_COLOR, PROVIDER_LABEL,
   type Agent, type Skill,
 } from "@/lib/types"
+
+function AgentAvatar({ avatar, size = 64 }: { avatar: string; size?: number }) {
+  const isImage = avatar.endsWith(".png") || avatar.endsWith(".jpg") || avatar.endsWith(".webp")
+  if (isImage) {
+    return (
+      <Image
+        src={`/agents/${avatar}`}
+        alt={avatar}
+        width={size}
+        height={size}
+        className="object-contain"
+        style={{ width: size, height: size }}
+      />
+    )
+  }
+  if (avatar) {
+    return <span style={{ fontSize: size * 0.5, lineHeight: 1 }}>{avatar}</span>
+  }
+  return <Bot style={{ width: size * 0.5, height: size * 0.5 }} className="text-muted-foreground" />
+}
 
 interface Props {
   agent: Agent
@@ -34,8 +55,8 @@ export function AgentCard({ agent, skills, onClick, onDelete }: Props) {
 
       {/* Avatar */}
       <div className="mb-3 flex justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-secondary text-4xl leading-none select-none">
-          {agent.avatar ? agent.avatar : <Bot className="h-8 w-8 text-muted-foreground" />}
+        <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-secondary/60 select-none overflow-hidden">
+          <AgentAvatar avatar={agent.avatar} size={80} />
         </div>
       </div>
 

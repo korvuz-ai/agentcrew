@@ -9,13 +9,31 @@ export interface Agent {
   name: string
   role: string
   backstory: string
-  avatar: string        // emoji e.g. "🤖" or initials fallback
+  avatar: string        // emoji e.g. "🤖" OR image filename e.g. "CEO-Fi.png"
   level: Level
   providers: Provider[]
   skillIds: string[]
   systemPromptOverride: string
   createdAt: string
 }
+
+// Images available in /public/agents/ — keep in sync with the folder
+export const AGENT_IMAGES = [
+  "CEO-Fi.png",
+  "CTO.png",
+  "CFO.png",
+  "AI-Engineer.png",
+  "Lead-Developer.png",
+  "LIFF-Developer.png",
+  "Head-of-UXUI.png",
+  "Content-SEO-Writer.png",
+  "Marketing-Manager.png",
+  "Staff.png",
+  "CEO-Invoice.png",
+  "CFO.png",
+  "Compliance-Invoice.png",
+  "Infrastructure-invoice.png",
+] as const
 
 export interface Skill {
   id: string

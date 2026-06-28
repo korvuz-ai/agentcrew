@@ -1,7 +1,7 @@
 // Purpose: Displays a single agent as a trading-card style tile with level, providers, skills
 // Used by: app/dashboard/agents/page.tsx
 
-import { Bot, Trash2 } from "lucide-react"
+import { Bot, Plus, Trash2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
   LEVEL_COLOR, LEVEL_LABEL, LEVEL_MODELS,
@@ -34,8 +34,8 @@ export function AgentCard({ agent, skills, onClick, onDelete }: Props) {
 
       {/* Avatar */}
       <div className="mb-3 flex justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-secondary">
-          <Bot className="h-8 w-8 text-muted-foreground" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-secondary text-4xl leading-none select-none">
+          {agent.avatar ? agent.avatar : <Bot className="h-8 w-8 text-muted-foreground" />}
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export function AgentCard({ agent, skills, onClick, onDelete }: Props) {
       </div>
 
       {/* Providers */}
-      <div className="mb-3 flex flex-wrap justify-center gap-1">
+      <div className="mb-2 flex flex-wrap justify-center gap-1">
         {agent.providers.map((p) => (
           <span key={p} className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${PROVIDER_COLOR[p]}`}>
             {PROVIDER_LABEL[p]}
@@ -59,7 +59,7 @@ export function AgentCard({ agent, skills, onClick, onDelete }: Props) {
         ))}
       </div>
 
-      {/* Model names for active level */}
+      {/* Model names */}
       <div className="mb-3 text-center">
         {agent.providers.map((p) => (
           <p key={p} className="text-[10px] text-muted-foreground/60">
@@ -87,14 +87,13 @@ export function AgentCard({ agent, skills, onClick, onDelete }: Props) {
   )
 }
 
-/** Dashed "add new" card */
 export function NewAgentCard({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
       className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/50 p-4 text-muted-foreground transition hover:border-primary/40 hover:text-foreground min-h-[220px]"
     >
-      <Bot className="mb-2 h-8 w-8" />
+      <Plus className="mb-2 h-8 w-8" />
       <span className="text-sm font-medium">New Agent</span>
     </button>
   )

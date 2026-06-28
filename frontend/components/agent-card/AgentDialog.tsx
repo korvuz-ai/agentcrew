@@ -27,10 +27,13 @@ interface Props {
   onClose: () => void
 }
 
+const EMOJI_OPTIONS = ["🤖","🧠","✍️","⚙️","📊","🗺️","🔍","💡","🛡️","🎯","📈","🧪","🌐","📝","🔧","🎨","📣","🤝","⚡","🔮"]
+
 const EMPTY = (): Omit<Agent, "id" | "createdAt"> => ({
   name: "",
   role: "",
   backstory: "",
+  avatar: "🤖",
   level: 2,
   providers: ["claude"],
   skillIds: [],
@@ -78,6 +81,27 @@ export function AgentDialog({ open, agent, skills, onSave, onClose }: Props) {
         </DialogHeader>
 
         <div className="space-y-5 py-1">
+          {/* Avatar emoji picker */}
+          <div className="space-y-1.5">
+            <Label>Avatar</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {EMOJI_OPTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => set("avatar", emoji)}
+                  className={`rounded-lg border p-1.5 text-xl transition ${
+                    form.avatar === emoji
+                      ? "border-primary/60 bg-primary/10 ring-1 ring-primary/40"
+                      : "border-border hover:bg-muted"
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Name + Role */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">

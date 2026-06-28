@@ -1,6 +1,6 @@
 # STRUCTURE.md (auto-generated โดย scripts/gen-structure-map.sh — อย่าแก้มือ)
 
-- `frontend/app/dashboard/agents/page.tsx` — Agent management page — grid of agent cards with create/edit/delete
+- `frontend/app/dashboard/agents/page.tsx` — Agent management page — grid of agent cards with create/edit/delete + demo seed loader
 - `frontend/app/dashboard/chat/page.tsx` — chat page — placeholder, built in Phase 4
 - `frontend/app/dashboard/history/page.tsx` — history page — placeholder, built in Phase 4
 - `frontend/app/dashboard/layout.tsx` — Dashboard shell — sidebar + main content area for all /dashboard/* pages
@@ -16,5 +16,6 @@
 - `frontend/components/shared/Sidebar.tsx` — Main navigation sidebar — logo, nav links, phase-gated items
 - `frontend/components/skill-card/SkillCard.tsx` — Single skill tile — name, description, category chip, usage count
 - `frontend/components/skill-card/SkillDialog.tsx` — Create / edit skill dialog with markdown editor for instructions
+- `frontend/lib/seeds.ts` — Demo seed data — loads a full example team + skills into localStorage
 - `frontend/lib/store.ts` — Client-side data store using localStorage — swap individual functions with API calls in Phase 3
 - `frontend/lib/types.ts` — Shared TypeScript types for agents, skills, and pipelines across the app

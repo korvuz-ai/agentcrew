@@ -67,7 +67,18 @@ export function useAgents() {
     [save]
   )
 
-  return { agents, createAgent, updateAgent, deleteAgent }
+  const loadSeeds = useCallback(
+    (seedAgents: Agent[], seedSkills: Skill[]) => {
+      const existingAgents = readLS<Agent[]>(AGENTS_KEY, [])
+      const existingSkills = readLS<Skill[]>(SKILLS_KEY, [])
+      writeLS(AGENTS_KEY, [...existingAgents, ...seedAgents])
+      writeLS(SKILLS_KEY, [...existingSkills, ...seedSkills])
+      setAgents([...existingAgents, ...seedAgents])
+    },
+    []
+  )
+
+  return { agents, createAgent, updateAgent, deleteAgent, loadSeeds }
 }
 
 // ── Skills ────────────────────────────────────────────────────────────────────

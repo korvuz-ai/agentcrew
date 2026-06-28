@@ -9,6 +9,7 @@ export interface Agent {
   name: string
   role: string
   backstory: string
+  avatar: string        // emoji e.g. "🤖" or initials fallback
   level: Level
   providers: Provider[]
   skillIds: string[]

@@ -1,0 +1,19 @@
+# 1) สร้าง settings.json ใส่ hook (ให้รัน script อัตโนมัติทุกครั้งที่ Claude เขียน/แก้ไฟล์)
+cat > .claude/settings.json <<'EOF'
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "bash scripts/gen-structure-map.sh" }
+        ]
+      }
+    ]
+  }
+}
+EOF
+
+# 2) ทดสอบรัน script เองสักครั้งให้แน่ใจว่าไม่ error (ผลตอนนี้จะเกือบเปล่า ปกติ)
+bash scripts/gen-structure-map.sh
+cat STRUCTURE.md

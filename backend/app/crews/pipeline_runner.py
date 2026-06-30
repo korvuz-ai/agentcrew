@@ -138,17 +138,26 @@ def _build_crew(spec: RunSpec, outputs_collector: list) -> object:
     if spec.process_type == "sequential":
         tasks = []
         for i, ca in enumerate(spec.worker_agents):
-            desc = (
-                spec.task_description if i == 0
-                else "Build on the previous agent's output and continue the task."
-            )
+            if i == 0:
+                desc = spec.task_description
+            else:
+                desc = (
+                    f"Original task: {spec.task_description}\n\n"
+                    f"You are step {i + 1} of {len(spec.worker_agents)} in this pipeline. "
+                    f"The previous agent has already worked on this. "
+                    f"Build on their output and complete your part of the task."
+                )
             agent_id = str(spec.worker_meta[i]["agent_id"]) if i < len(spec.worker_meta) else ""
-            tasks.append(Task(
+            task_kwargs: dict = dict(
                 description=desc,
                 agent=ca,
                 expected_output="A clear, complete response.",
                 callback=_make_task_cb(sid, agent_id, outputs_collector),
-            ))
+            )
+            # Pass previous task as context so CrewAI injects the actual output automatically
+            if tasks:
+                task_kwargs["context"] = [tasks[-1]]
+            tasks.append(Task(**task_kwargs))
         return Crew(
             agents=spec.worker_agents,
             tasks=tasks,

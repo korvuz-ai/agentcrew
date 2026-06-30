@@ -5,6 +5,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import ReactMarkdown from "react-markdown"
 import { ChevronDown, ChevronRight, FileText, Image as ImageIcon } from "lucide-react"
 import type { Agent, ChatMessage } from "@/lib/types"
 
@@ -96,8 +97,8 @@ export function ChatBubble({ message, agent }: Props) {
           </>
         )}
 
-        <div className="rounded-2xl rounded-tl-sm border border-border bg-card px-4 py-2.5 text-sm text-foreground whitespace-pre-wrap">
-          {message.content}
+        <div className="prose prose-sm dark:prose-invert max-w-none rounded-2xl rounded-tl-sm border border-border bg-card px-4 py-2.5 text-sm text-foreground">
+          <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
 
         {(message.tokens !== undefined || message.costUsd !== undefined || message.latencyMs !== undefined) && (

@@ -15,6 +15,7 @@ export interface Agent {
   providers: Provider[]
   skillIds: string[]
   systemPromptOverride: string
+  cwd?: string              // optional server path — enables file/shell tools when set
   createdAt: string
 }
 
@@ -66,4 +67,61 @@ export const PROVIDER_COLOR: Record<Provider, string> = {
   claude: "bg-violet-100 text-violet-700 border-violet-200",
   gemini: "bg-blue-100 text-blue-700 border-blue-200",
   gpt:    "bg-emerald-100 text-emerald-700 border-emerald-200",
+}
+
+// ── Pipeline ──────────────────────────────────────────────────────────────────
+
+export type PipelineType = "orchestrator-worker" | "sequential"
+
+export interface PipelineNode {
+  id: string
+  agentId: string
+  condition: string  // optional condition text (used in orchestrator-worker workers)
+}
+
+export interface Pipeline {
+  id: string
+  name: string
+  description: string
+  type: PipelineType
+  orchestratorId: string   // orchestrator-worker only
+  nodes: PipelineNode[]    // workers (O-W) or ordered steps (sequential)
+  cwd?: string             // working directory context for this pipeline run
+  createdAt: string
+}
+
+// ── Chat / Session ────────────────────────────────────────────────────────────
+
+export type SessionStatus = "active" | "running" | "completed" | "failed"
+
+export interface ChatMessage {
+  id: string
+  role: "user" | "agent"
+  agentId?: string
+  content: string
+  thinking?: string     // collapsible pre-message reasoning
+  tokens?: number
+  costUsd?: number
+  latencyMs?: number
+  createdAt: string
+}
+
+export interface Session {
+  id: string
+  name: string
+  pipelineId?: string   // set when mode = pipeline
+  agentId?: string      // set when mode = single-agent
+  messages: ChatMessage[]
+  totalCostUsd: number
+  status: SessionStatus
+  createdAt: string
+}
+
+// ── App Settings ──────────────────────────────────────────────────────────────
+
+export interface AppSettings {
+  companyId: string          // UUID of the company in DB — set to enable API mode
+  providerKeys: Record<Provider, string>
+  budgetCapUsd: number
+  alertThresholdPct: number
 }

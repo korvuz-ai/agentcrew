@@ -1,21 +1,28 @@
 # STRUCTURE.md (auto-generated โดย scripts/gen-structure-map.sh — อย่าแก้มือ)
 
 - `frontend/app/dashboard/agents/page.tsx` — Agent management page — grid of agent cards with create/edit/delete
-- `frontend/app/dashboard/chat/page.tsx` — chat page — placeholder, built in Phase 4
-- `frontend/app/dashboard/history/page.tsx` — history page — placeholder, built in Phase 4
+- `frontend/app/dashboard/chat/page.tsx` — Chat page — LINE-style session list + agent trace conversation view
+- `frontend/app/dashboard/history/page.tsx` — History page — searchable session table + read-only chat replay dialog
 - `frontend/app/dashboard/layout.tsx` — Dashboard shell — sidebar + main content area for all /dashboard/* pages
 - `frontend/app/dashboard/library/page.tsx` — Skill library page — catalog of reusable skill cards with create/edit/delete
+- `frontend/app/dashboard/office/page.tsx` — Office floor plan — agents grouped by department zone, live desk states from WS
 - `frontend/app/dashboard/org-chart/page.tsx` — Org chart — top-down tree using managerId relationships, compact agent nodes
 - `frontend/app/dashboard/page.tsx` — Dashboard home — redirects to agents page (main landing after Phase 2)
-- `frontend/app/dashboard/pipelines/page.tsx` — pipelines page — placeholder, built in Phase 3
-- `frontend/app/dashboard/settings/page.tsx` — settings page — placeholder, built in Phase 5
+- `frontend/app/dashboard/pipelines/page.tsx` — Pipeline list page — grid of pipeline cards with create/edit/delete
+- `frontend/app/dashboard/settings/page.tsx` — Settings page — API key vault per provider + budget cap
 - `frontend/app/layout.tsx` — Root layout — global fonts, metadata, base HTML structure
 - `frontend/app/page.tsx` — Root page — redirects directly to dashboard (no auth required)
 - `frontend/components/agent-card/AgentCard.tsx` — Displays a single agent as a trading-card style tile with level, providers, skills
 - `frontend/components/agent-card/AgentDialog.tsx` — Create / edit agent dialog — level picker, provider toggles, skill assignment
+- `frontend/components/chat/ChatBubble.tsx` — Single chat message bubble — user (right) or agent (left) with thinking + stats
+- `frontend/components/chat/NewSessionDialog.tsx` — Dialog to start a new chat session — pick pipeline OR single agent
+- `frontend/components/office/AgentDesk.tsx` — Agent desk card for the office floor plan — avatar, name, role, animated state
+- `frontend/components/pipeline/PipelineCard.tsx` — Pipeline card tile for the pipelines list page
+- `frontend/components/pipeline/PipelineDialog.tsx` — Create / edit pipeline dialog — type toggle, orchestrator/worker or sequential step builder
 - `frontend/components/shared/Sidebar.tsx` — Main navigation sidebar — logo, nav links, phase-gated items
 - `frontend/components/skill-card/SkillCard.tsx` — Single skill tile — name, description, category chip, usage count
 - `frontend/components/skill-card/SkillDialog.tsx` — Create / edit skill dialog with markdown editor for instructions
 - `frontend/lib/seeds.ts` — Demo seed data — 13 agents (all images) + 25 company skills with hierarchy
-- `frontend/lib/store.ts` — Client-side data store using localStorage — swap individual functions with API calls in Phase 3
+- `frontend/lib/store.ts` — Data store — API mode when companyId is configured, localStorage otherwise
 - `frontend/lib/types.ts` — Shared TypeScript types for agents, skills, and pipelines across the app
+- `frontend/lib/useSessionWS.ts` — WebSocket hook for real-time session event streaming (B5)

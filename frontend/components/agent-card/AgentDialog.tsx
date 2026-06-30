@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FolderOpen } from "lucide-react"
 import {
   AGENT_IMAGES, LEVEL_COLOR, LEVEL_LABEL, LEVEL_MODELS, PROVIDER_COLOR, PROVIDER_LABEL,
   type Agent, type Level, type Provider, type Skill,
@@ -39,6 +40,7 @@ const EMPTY = (): Omit<Agent, "id" | "createdAt"> => ({
   providers: ["claude"],
   skillIds: [],
   systemPromptOverride: "",
+  cwd: "",
 })
 
 export function AgentDialog({ open, agent, skills, allAgents = [], onSave, onClose }: Props) {
@@ -233,6 +235,26 @@ export function AgentDialog({ open, agent, skills, allAgents = [], onSave, onClo
               </div>
             </div>
           )}
+
+          {/* Server Access (cwd) */}
+          <div className="space-y-1.5">
+            <Label className="flex items-center gap-1.5">
+              <FolderOpen className="h-3.5 w-3.5" />
+              Server path
+              <span className="text-muted-foreground/60 font-normal">(optional)</span>
+            </Label>
+            <Input
+              value={form.cwd ?? ""}
+              onChange={(e) => set("cwd", e.target.value || undefined)}
+              placeholder="/opt/agent-company"
+              className="font-mono text-sm"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              {form.cwd
+                ? <span className="text-emerald-600 font-medium">✓ Agent จะเข้า server ได้ — อ่านไฟล์ / รัน command ใน path นี้</span>
+                : "ไม่ใส่ = agent ตอบคำถามปกติ ไม่มี file access"}
+            </p>
+          </div>
 
           {/* System prompt override */}
           <details className="group">

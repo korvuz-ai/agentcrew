@@ -16,6 +16,7 @@ export default function AgentsPage() {
   const [editing, setEditing] = useState<Agent | null | undefined>(undefined)
 
   return (
+    <div className="flex-1 overflow-y-auto p-6">
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -67,6 +68,7 @@ export default function AgentsPage() {
           onClose={() => setEditing(undefined)}
         />
       )}
+    </div>
     </div>
   )
 }

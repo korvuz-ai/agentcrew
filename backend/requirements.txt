@@ -1,0 +1,28 @@
+# ── B0: Web framework (active) ─────────────────────────────────────────────────
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic-settings==2.7.0
+python-dotenv==1.0.1
+httpx
+
+# ── B1: Database ──────────────────────────────────────────────────────────────
+sqlalchemy[asyncio]==2.0.36
+alembic==1.14.0
+asyncpg==0.30.0
+
+# ── B1: Cache / Queue ─────────────────────────────────────────────────────────
+redis[asyncio]==5.2.0
+
+# ── B2: Auth ──────────────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+svix==1.45.0
+
+# ── B7: Encryption (ApiKeyVault) ─────────────────────────────────────────────
+cryptography==44.0.0
+
+# ── B4: AI orchestration ──────────────────────────────────────────────────────
+crewai
+
+# ── B6: File storage (MinIO S3) ───────────────────────────────────────────────
+minio
+python-multipart

@@ -1,7 +1,7 @@
 // Purpose: Demo seed data — 13 agents (all images) + 25 company skills with hierarchy
 // Used by: app/dashboard/agents/page.tsx (reset & load demo button)
 
-import type { Agent, Skill } from "./types"
+import type { Agent, ChatMessage, Pipeline, Session, Skill } from "./types"
 
 function uid() {
   return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
@@ -13,7 +13,7 @@ function skill(
   return { id: uid(), name, category, description, instructions, createdAt: new Date().toISOString() }
 }
 
-export function buildDemoTeam(): { agents: Agent[]; skills: Skill[] } {
+export function buildDemoTeam(): { agents: Agent[]; skills: Skill[]; pipelines: Pipeline[]; sessions: Session[] } {
   // ── Skills ──────────────────────────────────────────────────────────────────
   const skills: Skill[] = [
     // Strategic
@@ -195,5 +195,67 @@ export function buildDemoTeam(): { agents: Agent[]; skills: Skill[] } {
     },
   ]
 
-  return { agents, skills }
+  // ── Demo Pipelines ───────────────────────────────────────────────────────────
+  const pipelines: Pipeline[] = [
+    {
+      id: uid(),
+      name: "Content Marketing Sprint",
+      description: "Marketing brief → SEO-optimized final copy. Marcus plans, Sophie writes.",
+      type: "sequential",
+      orchestratorId: "",
+      nodes: [
+        { id: uid(), agentId: ids.mktg, condition: "" },
+        { id: uid(), agentId: ids.content, condition: "" },
+      ],
+      createdAt: now,
+    },
+    {
+      id: uid(),
+      name: "Tech Build Crew",
+      description: "CTO-led crew: architect, engineer, and infra collaborate on technical tasks.",
+      type: "orchestrator-worker",
+      orchestratorId: ids.cto,
+      nodes: [
+        { id: uid(), agentId: ids.lead,  condition: "When feature implementation is needed" },
+        { id: uid(), agentId: ids.ai,    condition: "When AI/ML components are involved" },
+        { id: uid(), agentId: ids.infra, condition: "When infrastructure changes are required" },
+      ],
+      createdAt: now,
+    },
+  ]
+
+  // ── Demo Session ─────────────────────────────────────────────────────────────
+  const demoMessages: ChatMessage[] = [
+    {
+      id: uid(), role: "user",
+      content: "Write a blog post about AI agents for enterprise customers. Focus on ROI and practical use cases.",
+      createdAt: now,
+    },
+    {
+      id: uid(), role: "agent", agentId: ids.mktg,
+      thinking: "Analyzing the request... target audience is enterprise buyers (CTOs, IT leaders), not developers. Need to lead with business value: time saved, cost reduced, risk managed. I'll draft the marketing brief and hand off to Sophie for the full copy.",
+      content: "I've outlined the marketing brief:\n\n**Target Audience:** Enterprise IT leaders, CTOs, and procurement managers\n**Key Angle:** ROI-first messaging with concrete metrics\n**Recommended Structure:**\n1. Hook: The productivity gap AI agents close\n2. Top 5 enterprise use cases with ROI data\n3. 3-phase implementation roadmap\n4. Risk & compliance considerations\n5. CTA: Book a pilot\n\nHanding to Sophie for the SEO-optimized full draft.",
+      tokens: 847, costUsd: 0.0021, latencyMs: 2340, createdAt: now,
+    },
+    {
+      id: uid(), role: "agent", agentId: ids.content,
+      thinking: "Reviewing Marcus's brief. Primary keyword: 'AI agents for enterprise' (2,400 mo searches, KD 42). Secondary: 'enterprise AI automation', 'AI agent ROI'. Will optimize H1, first paragraph, and meta description. Targeting 1,800 words for content depth score.",
+      content: "# AI Agents for Enterprise: A Practical ROI Guide\n\nEnterprise teams using AI agents report **40–60% reduction in repetitive task time** within the first quarter.\n\n## What Are Enterprise AI Agents?\n\nAI agents are autonomous systems that plan, execute multi-step tasks, and collaborate — far beyond single-turn chatbots.\n\n## Top 5 Enterprise Use Cases\n\n1. **Customer Support Automation** — 70% ticket deflection, $0.80 cost per resolved ticket\n2. **Document Processing & Compliance** — 10× faster than manual review\n3. **Software Development** — 35% faster sprint velocity\n4. **Financial Reporting** — 4-hour reports down to 12 minutes\n5. **Market Research** — real-time synthesis across 50+ sources\n\n*[Full draft: 1,847 words]*\n\n**Meta:** Discover how enterprise AI agents deliver 40-60% productivity gains. ROI data, 5 use cases, and implementation roadmap for IT leaders.",
+      tokens: 1203, costUsd: 0.0031, latencyMs: 3180, createdAt: now,
+    },
+  ]
+
+  const sessions: Session[] = [
+    {
+      id: uid(),
+      name: "Enterprise AI Blog Post",
+      pipelineId: pipelines[0].id,
+      messages: demoMessages,
+      totalCostUsd: 0.0052,
+      status: "completed",
+      createdAt: now,
+    },
+  ]
+
+  return { agents, skills, pipelines, sessions }
 }

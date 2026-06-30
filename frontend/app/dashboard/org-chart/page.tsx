@@ -126,6 +126,7 @@ export default function OrgChartPage() {
   const roots = agents.filter((a) => !a.managerId || !agentIds.has(a.managerId))
 
   return (
+    <div className="flex-1 overflow-y-auto p-6">
     <div className="overflow-auto">
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -154,6 +155,7 @@ export default function OrgChartPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }

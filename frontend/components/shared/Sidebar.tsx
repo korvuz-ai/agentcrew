@@ -12,6 +12,7 @@ import {
   LayoutGrid,
   MessageSquare,
   Settings,
+  Sofa,
   Workflow,
 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
@@ -24,9 +25,8 @@ const NAV = [
   { href: "/dashboard/pipelines",  label: "Pipelines",  icon: Workflow,      phase: 3 },
   { href: "/dashboard/chat",       label: "Chat",       icon: MessageSquare, phase: 4 },
   { href: "/dashboard/history",    label: "History",    icon: History,       phase: 5 },
+  { href: "/dashboard/office",     label: "Office",     icon: Sofa,          phase: 6 },
 ]
-
-const CURRENT_PHASE = 2
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -42,7 +42,7 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
         {NAV.map(({ href, label, icon: Icon, phase }) => {
           const active = pathname.startsWith(href)
-          const locked = phase > CURRENT_PHASE
+          const locked = phase > 6
           return (
             <Link
               key={href}

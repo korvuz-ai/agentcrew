@@ -1,6 +1,8 @@
 name: agent-company
 
 services:
+
+  # ── Frontend (Next.js) ───────────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -11,15 +13,96 @@ services:
       - "127.0.0.1:8790:3000"
     environment:
       NODE_ENV: production
+      BACKEND_URL: http://backend:8000
     restart: unless-stopped
+    networks:
+      - internal
 
-  # Phase 3 — uncomment when backend is ready
-  # postgres:
-  #   image: postgres:16-alpine
-  #   ...
-  # redis:
-  #   image: redis:7-alpine
-  #   ...
-  # minio:
-  #   image: minio/minio
-  #   ...
+  # ── Backend (FastAPI) ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: agent-company-backend:latest
+    container_name: agent-company-backend
+    ports:
+      - "127.0.0.1:8791:8000"
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD}@postgres:5432/agentcrew
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      MINIO_ENDPOINT: minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: agent-company-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: agentcrew
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentcrew"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── Redis ────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: agent-company-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # ── MinIO ────────────────────────────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: agent-company-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9010:9000"   # S3 API
+      - "127.0.0.1:9011:9001"   # Web console → http://127.0.0.1:9011
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  internal:
+    driver: bridge

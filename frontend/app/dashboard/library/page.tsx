@@ -15,6 +15,7 @@ export default function LibraryPage() {
   const [editing, setEditing] = useState<Skill | null | undefined>(undefined)
 
   return (
+    <div className="flex-1 overflow-y-auto p-6">
     <div className="mx-auto max-w-5xl">
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-foreground">Skill Library</h1>
@@ -46,6 +47,7 @@ export default function LibraryPage() {
           onClose={() => setEditing(undefined)}
         />
       )}
+    </div>
     </div>
   )
 }

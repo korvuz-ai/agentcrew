@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import threading
+import time as _time
 from dataclasses import dataclass, field
 from decimal import Decimal
 from uuid import UUID
@@ -115,17 +116,26 @@ def _make_step_cb(session_id: str):
     return cb
 
 
-def _make_task_cb(session_id: str, agent_id: str, outputs_collector: list):
-    """CrewAI task callback — emits agent_done and collects per-agent output for DB persist."""
+def _make_task_cb(session_id: str, agent_id: str, outputs_collector: list,
+                  task_start_ref: list):
+    """CrewAI task callback — emits agent_done with latency and collects output for DB persist."""
     def cb(task_output):
         try:
+            elapsed_ms = int((_time.time() - task_start_ref[0]) * 1000)
+            # Advance start ref so the NEXT task measures from this moment
+            task_start_ref[0] = _time.time()
             output = getattr(task_output, "raw", None) or str(task_output)
-            outputs_collector.append({"agent_id": agent_id, "output": str(output)})
+            outputs_collector.append({
+                "agent_id": agent_id,
+                "output": str(output),
+                "latency_ms": elapsed_ms,
+            })
             _emit(session_id, {
                 "type": "agent_done",
                 "session_id": session_id,
                 "agent_id": agent_id,
                 "output": str(output)[:3000],
+                "latency_ms": elapsed_ms,
             })
         except Exception:
             pass
@@ -135,6 +145,10 @@ def _make_task_cb(session_id: str, agent_id: str, outputs_collector: list):
 def _build_crew(spec: RunSpec, outputs_collector: list) -> object:
     """Build a Crew from spec (called once per attempt)."""
     sid = spec.session_id
+    # Shared mutable ref so each task callback can measure its own wall-clock duration
+    # and advance the ref so the NEXT task starts from the right baseline.
+    task_start_ref = [_time.time()]
+
     if spec.process_type == "sequential":
         tasks = []
         for i, ca in enumerate(spec.worker_agents):
@@ -152,7 +166,7 @@ def _build_crew(spec: RunSpec, outputs_collector: list) -> object:
                 description=desc,
                 agent=ca,
                 expected_output="A clear, complete response.",
-                callback=_make_task_cb(sid, agent_id, outputs_collector),
+                callback=_make_task_cb(sid, agent_id, outputs_collector, task_start_ref),
             )
             # Pass previous task as context so CrewAI injects the actual output automatically
             if tasks:
@@ -173,7 +187,7 @@ def _build_crew(spec: RunSpec, outputs_collector: list) -> object:
     task = Task(
         description=spec.task_description,
         expected_output="A comprehensive, complete response.",
-        callback=_make_task_cb(sid, orch_id, outputs_collector),
+        callback=_make_task_cb(sid, orch_id, outputs_collector, task_start_ref),
     )
     all_agents = (
         [spec.orchestrator_agent] + spec.worker_agents
@@ -495,6 +509,7 @@ async def _run(
                 role="agent",
                 content=ao["output"],
                 agent_id=aid,
+                latency_ms=ao.get("latency_ms", 0),
             ))
     else:
         # Fallback: save single final output attributed to first agent

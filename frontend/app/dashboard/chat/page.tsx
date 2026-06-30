@@ -362,6 +362,17 @@ export default function ChatPage() {
                 {isRunning && <Loader2 className="h-3 w-3 animate-spin text-yellow-500" />}
                 <span className={cn("h-2 w-2 rounded-full", STATUS_DOT[selected.status] ?? "bg-neutral-400")} />
                 <span className="text-xs capitalize text-muted-foreground">{selected.status}</span>
+                {selected.status === "completed" && (() => {
+                  const agentMsgs = selected.messages.filter(m => m.role === "agent")
+                  const totalMs = agentMsgs.reduce((s, m) => s + (m.latencyMs ?? 0), 0)
+                  return totalMs > 0 ? (
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 font-mono text-xs text-muted-foreground">
+                      {totalMs >= 60000
+                        ? `${Math.floor(totalMs / 60000)}m ${Math.round((totalMs % 60000) / 1000)}s`
+                        : `${(totalMs / 1000).toFixed(1)}s`}
+                    </span>
+                  ) : null
+                })()}
                 {selected.totalCostUsd > 0 && (
                   <span className="rounded-full bg-muted px-2.5 py-0.5 font-mono text-xs text-muted-foreground">
                     ${selected.totalCostUsd.toFixed(4)}
